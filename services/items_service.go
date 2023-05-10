@@ -40,7 +40,7 @@ func GetItems() ([]models.Item, error) {
 
 func SaveItem(ctx context.Context, item *models.Item) (models.Item, error) {
 
-	// crear un validador para la estructura Usuario
+	// crear un validador para la estructura Items
 	validate := validator.New()
 
 	err := validate.Struct(item)
