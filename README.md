@@ -23,6 +23,33 @@ To run this project, you will need to add the following environment variables to
 
 `DB_PASSWORD`
 
+## API Reference
+
+#### Get all items
+
+```http
+  GET /items
+```
+
+#### Post item
+
+```http
+  POST /items
+```
+Body Request
+
+```json
+{
+    "name":"James",
+    "orderDate":"2022-01-02T15:04:05Z",
+    "product":"Product 3",
+    "quantity":22,
+    "price":82.96
+}
+
+```
+
+
 ## Run Locally
 
 Start the server
