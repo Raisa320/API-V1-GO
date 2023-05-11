@@ -49,6 +49,49 @@ To run this project, you will need to add the following environment variables to
 
 ```
 
+#### Get One Item
+```http
+  GET /items/{id}
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `int` | **Required**. Id of item to fetch |
+
+#### Update item
+```http
+  PUT /items/{id}
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `int` | **Required**. Id of item to fetch |
+
+`Example Body Request`
+
+```json
+{
+    "name":"James",
+    "orderDate":"2022-01-02T15:04:05Z",
+    "product":"Product 3",
+    "quantity":22,
+    "price":82.96
+}
+```
+
+#### Delete item
+```http
+  DELETE /items/{id}
+```
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `int` | **Required**. Id of item to fetch |
+
+#### Search item by customer
+```http
+  GET /items?customer={customer}
+```
+| Query Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `customer`      | `string` | **Required**. Customer name of item to fetch |
 
 ## Run Locally
 
