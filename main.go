@@ -16,6 +16,10 @@ func handlers() http.Handler {
 
 	handler.HandleFunc("/items", controllers.GetItems).Methods("GET")
 	handler.HandleFunc("/items", controllers.SaveItem).Methods("POST")
+	handler.HandleFunc("/items/{id}", controllers.GetItem).Methods("GET")
+	handler.HandleFunc("/item", controllers.SearchItemByCustomer).Methods("GET")
+	handler.HandleFunc("/items/{id}", controllers.UpdateItem).Methods("PUT")
+	handler.HandleFunc("/items/{id}", controllers.DeleteItem).Methods("DELETE")
 	return handler
 }
 
