@@ -15,6 +15,7 @@ func handlers() http.Handler {
 	handler := mux.NewRouter()
 
 	handler.HandleFunc("/items", controllers.GetItems).Methods("GET")
+	handler.HandleFunc("/itemsPerPage", controllers.GetItemsPage).Methods("GET")
 	handler.HandleFunc("/items", controllers.SaveItem).Methods("POST")
 	handler.HandleFunc("/items/{id}", controllers.GetItem).Methods("GET")
 	handler.HandleFunc("/item", controllers.SearchItemByCustomer).Methods("GET")

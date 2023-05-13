@@ -40,6 +40,36 @@ func GetItems() ([]models.Item, error) {
 	return items, nil
 }
 
+func GetItemsPage(pageNumber, itemsPerPage int) ([]models.Item, int, error) {
+
+	startIndex := itemsPerPage * (pageNumber - 1)
+
+	var count int
+	err := Db.QueryRow("SELECT COUNT(*) FROM items").Scan(&count)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	rows, err := Db.Query("SELECT * FROM items ORDER BY id OFFSET $1 LIMIT $2", startIndex, itemsPerPage)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var items []models.Item
+	for rows.Next() {
+		var item models.Item
+		rows.Scan(&item.ID, &item.Customer_name, &item.Order_date, &item.Product, &item.Quantity, &item.Price, &item.Details)
+		items = append(items, item)
+	}
+
+	if len(items) == 0 {
+		return items, 0, fmt.Errorf("no items found for page %d", pageNumber)
+	}
+
+	return items, count, nil
+}
+
 func GetItem(itemId int) (*models.Item, error) {
 
 	query := `

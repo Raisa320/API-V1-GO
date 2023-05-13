@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -41,6 +42,52 @@ func GetItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(items)
+}
+
+func GetItemsPage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := r.URL.Query() // page - itemsPerPage
+	pageParam := params["page"]
+	itemsPerPageParam := params["itemsPerPage"]
+	if len(pageParam) == 0 {
+		pageParam = append(pageParam, "1")
+	}
+	if len(itemsPerPageParam) == 0 {
+		itemsPerPageParam = append(itemsPerPageParam, "5")
+	}
+
+	pageNumber, errorPage := strconv.Atoi(pageParam[0])
+	itemsPerPage, errorNroItem := strconv.Atoi(itemsPerPageParam[0])
+	if errorPage != nil || errorNroItem != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Query params no numbers")
+		return
+	}
+
+	items, totalItems, err := services.GetItemsPage(pageNumber, itemsPerPage)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	totalPages := int(math.Ceil(float64(totalItems) / float64(itemsPerPage)))
+
+	// :o Mapa de info de la paginacion
+	paginationInfo := map[string]interface{}{
+		"totalPages":  totalPages,
+		"currentPage": pageNumber,
+	}
+
+	// Mapa de respuesta
+	responseData := map[string]interface{}{
+		"items":      items,
+		"pagination": paginationInfo,
+	}
+
+	json.NewEncoder(w).Encode(responseData)
 }
 
 func SaveItem(w http.ResponseWriter, r *http.Request) {
