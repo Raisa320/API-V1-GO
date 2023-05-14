@@ -93,6 +93,16 @@ To run this project, you will need to add the following environment variables to
 | :-------- | :------- | :-------------------------------- |
 | `customer`      | `string` | **Required**. Customer name of item to fetch |
 
+
+#### Get Items Pagination
+```http
+  GET /itemsPerPage?page={page}&itemsPerPage={itemsPerPage}
+```
+| Query Params | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `page`      | `int` | **Optional**. Number of page   |
+| `itemsPerPage`      | `int` | **Optional**. Total items per page |
+
 ## Run Locally
 
 Start the server
