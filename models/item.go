@@ -10,4 +10,5 @@ type Item struct {
 	Quantity      int       `json:"quantity" validate:"required"`
 	Price         float64   `json:"price" validate:"required"`
 	Details       *string   `json:"details,omitempty"`
+	TotalPrice    float64   `json:"totalPrice"`
 }

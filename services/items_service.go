@@ -10,6 +10,10 @@ import (
 	"github.com/raisa320/API/models"
 )
 
+func TotalPriceItem(quantity int, price float64) float64 {
+	return float64(quantity) * price
+}
+
 // GetItems obtiene todos los items de la tabla 'items' de la base de datos.
 // Retorna una lista de struct 'models.Item' y un error en caso de que haya ocurrido alguno.
 func GetItems() ([]models.Item, error) {
@@ -28,6 +32,7 @@ func GetItems() ([]models.Item, error) {
 	for rows.Next() {
 		var item models.Item
 		rows.Scan(&item.ID, &item.Customer_name, &item.Order_date, &item.Product, &item.Quantity, &item.Price, &item.Details)
+		item.TotalPrice = TotalPriceItem(item.Quantity, item.Price)
 		items = append(items, item)
 	}
 
