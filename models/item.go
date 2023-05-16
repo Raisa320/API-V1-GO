@@ -11,4 +11,9 @@ type Item struct {
 	Price         float64   `json:"price" validate:"required"`
 	Details       *string   `json:"details,omitempty"`
 	TotalPrice    float64   `json:"totalPrice"`
+	CantidadViews int       `json:"cantidadViews"`
+}
+
+func (item *Item) GetTotalPrice() float64 {
+	return float64(item.Quantity) * item.Price
 }

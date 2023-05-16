@@ -5,13 +5,20 @@ import (
 	"database/sql"
 	"fmt"
 	"reflect"
+	"sync"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/raisa320/API/models"
 )
 
-func TotalPriceItem(quantity int, price float64) float64 {
-	return float64(quantity) * price
+var mutexViews sync.Mutex
+var mutexGetItem sync.Mutex
+
+func IncrementViews(totalViews *int) int {
+	mutexViews.Lock()
+	var total = *totalViews + 1
+	mutexViews.Unlock()
+	return total
 }
 
 // GetItems obtiene todos los items de la tabla 'items' de la base de datos.
@@ -32,7 +39,7 @@ func GetItems() ([]models.Item, error) {
 	for rows.Next() {
 		var item models.Item
 		rows.Scan(&item.ID, &item.Customer_name, &item.Order_date, &item.Product, &item.Quantity, &item.Price, &item.Details)
-		item.TotalPrice = TotalPriceItem(item.Quantity, item.Price)
+		item.TotalPrice = item.GetTotalPrice()
 		items = append(items, item)
 	}
 
@@ -78,12 +85,12 @@ func GetItemsPage(pageNumber, itemsPerPage int) ([]models.Item, int, error) {
 func GetItem(itemId int) (*models.Item, error) {
 
 	query := `
-    SELECT id, customer_name, order_date, product, quantity, price, details
+    SELECT id, customer_name, order_date, product, quantity, price, details, cantidad_views
         FROM items WHERE id = $1;
     `
 	var item models.Item
 
-	err := Db.QueryRow(query, itemId).Scan(&item.ID, &item.Customer_name, &item.Order_date, &item.Product, &item.Quantity, &item.Price, &item.Details)
+	err := Db.QueryRow(query, itemId).Scan(&item.ID, &item.Customer_name, &item.Order_date, &item.Product, &item.Quantity, &item.Price, &item.Details, &item.CantidadViews)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No se encontró ningún objeto
@@ -91,6 +98,17 @@ func GetItem(itemId int) (*models.Item, error) {
 		}
 		return nil, err
 	}
+	item.CantidadViews = IncrementViews(&item.CantidadViews)
+	mutexGetItem.Lock()
+	query = `
+    UPDATE items SET cantidad_views=$1
+	WHERE id = $2 ;
+    `
+	_, err = Db.Exec(query, item.CantidadViews, itemId)
+	if err != nil {
+		return nil, err
+	}
+	mutexGetItem.Unlock()
 	return &item, nil
 }
 
