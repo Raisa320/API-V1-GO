@@ -12,7 +12,8 @@ import (
 )
 
 var mutexViews sync.Mutex
-var mutexGetItem sync.Mutex
+
+//var mutexGetItem sync.Mutex
 
 func IncrementViews(totalViews *int) int {
 	mutexViews.Lock()
@@ -99,7 +100,7 @@ func GetItem(itemId int) (*models.Item, error) {
 		return nil, err
 	}
 	item.CantidadViews = IncrementViews(&item.CantidadViews)
-	mutexGetItem.Lock()
+	//mutexGetItem.Lock()
 	query = `
     UPDATE items SET cantidad_views=$1
 	WHERE id = $2 ;
@@ -108,7 +109,7 @@ func GetItem(itemId int) (*models.Item, error) {
 	if err != nil {
 		return nil, err
 	}
-	mutexGetItem.Unlock()
+	//mutexGetItem.Unlock()
 	return &item, nil
 }
 

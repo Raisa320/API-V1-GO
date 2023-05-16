@@ -1,6 +1,7 @@
 package services
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/raisa320/API/models"
@@ -29,7 +30,17 @@ func TestTotalPriceItem(t *testing.T) {
 
 func TestIncrementViews(t *testing.T) {
 	var increment = 0
+	var mutex sync.Mutex
+	var w sync.WaitGroup
 	for i := 0; i < 5; i++ {
-		go IncrementViews(&increment)
+		w.Add(1)
+		go func() {
+			mutex.Lock()
+			increment = IncrementViews(&increment)
+			mutex.Unlock()
+			w.Done()
+		}()
 	}
+	w.Wait()
+	t.Log("Result:", increment)
 }
