@@ -84,19 +84,24 @@ func GetItemsPage(pageNumber, itemsPerPage int) ([]models.Item, int, error) {
 }
 
 func GetItem(itemId int) (*models.Item, error) {
-
+	tx, err := Db.Begin()
+	if err != nil {
+		return nil, err
+	}
 	query := `
     SELECT id, customer_name, order_date, product, quantity, price, details, cantidad_views
         FROM items WHERE id = $1;
     `
 	var item models.Item
 
-	err := Db.QueryRow(query, itemId).Scan(&item.ID, &item.Customer_name, &item.Order_date, &item.Product, &item.Quantity, &item.Price, &item.Details, &item.CantidadViews)
+	err = tx.QueryRow(query, itemId).Scan(&item.ID, &item.Customer_name, &item.Order_date, &item.Product, &item.Quantity, &item.Price, &item.Details, &item.CantidadViews)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No se encontró ningún objeto
+			tx.Commit()
 			return nil, nil
 		}
+		tx.Rollback()
 		return nil, err
 	}
 	item.CantidadViews = IncrementViews(&item.CantidadViews)
@@ -107,8 +112,10 @@ func GetItem(itemId int) (*models.Item, error) {
     `
 	_, err = Db.Exec(query, item.CantidadViews, itemId)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
+	tx.Commit()
 	//mutexGetItem.Unlock()
 	return &item, nil
 }
