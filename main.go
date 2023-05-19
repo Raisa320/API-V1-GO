@@ -5,14 +5,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/raisa320/API/config"
 	"github.com/raisa320/API/controllers"
 	"github.com/raisa320/API/services"
-	"github.com/rs/cors"
 )
 
-func handlers() http.Handler {
+func myhandlers() http.Handler {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/items", controllers.GetItems).Methods("GET")
@@ -23,7 +23,12 @@ func handlers() http.Handler {
 	router.HandleFunc("/items/{id}", controllers.UpdateItem).Methods("PUT")
 	router.HandleFunc("/items/{id}", controllers.DeleteItem).Methods("DELETE")
 
-	handler := cors.Default().Handler(router) //AGREGANDO MIDDLEWARE CORS A TODAS  LAS RUTAS
+	// Configura las opciones de CORS. Por ejemplo, permite todas las origenes:
+	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
+	//allowedMethods := handlers.AllowedMethods([]string{"GET", "POST"})
+	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	// Envolviendo tus rutas con CORS.
+	handler := handlers.CORS(allowedOrigins, allowedMethods)(router)
 	return handler
 }
 
@@ -34,7 +39,7 @@ func main() {
 	services.InitDB()
 	services.Db.PingOrDie()
 
-	router := handlers()
+	router := myhandlers()
 
 	server := config.NewServer(*port, router)
 
