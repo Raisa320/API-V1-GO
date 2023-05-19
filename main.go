@@ -9,18 +9,21 @@ import (
 	"github.com/raisa320/API/config"
 	"github.com/raisa320/API/controllers"
 	"github.com/raisa320/API/services"
+	"github.com/rs/cors"
 )
 
 func handlers() http.Handler {
-	handler := mux.NewRouter()
+	router := mux.NewRouter()
 
-	handler.HandleFunc("/items", controllers.GetItems).Methods("GET")
-	handler.HandleFunc("/itemsPerPage", controllers.GetItemsPage).Methods("GET")
-	handler.HandleFunc("/items", controllers.SaveItem).Methods("POST")
-	handler.HandleFunc("/items/{id}", controllers.GetItem).Methods("GET")
-	handler.HandleFunc("/item", controllers.SearchItemByCustomer).Methods("GET")
-	handler.HandleFunc("/items/{id}", controllers.UpdateItem).Methods("PUT")
-	handler.HandleFunc("/items/{id}", controllers.DeleteItem).Methods("DELETE")
+	router.HandleFunc("/items", controllers.GetItems).Methods("GET")
+	router.HandleFunc("/itemsPerPage", controllers.GetItemsPage).Methods("GET")
+	router.HandleFunc("/items", controllers.SaveItem).Methods("POST")
+	router.HandleFunc("/items/{id}", controllers.GetItem).Methods("GET")
+	router.HandleFunc("/item", controllers.SearchItemByCustomer).Methods("GET")
+	router.HandleFunc("/items/{id}", controllers.UpdateItem).Methods("PUT")
+	router.HandleFunc("/items/{id}", controllers.DeleteItem).Methods("DELETE")
+
+	handler := cors.Default().Handler(router) //AGREGANDO MIDDLEWARE CORS A TODAS  LAS RUTAS
 	return handler
 }
 
